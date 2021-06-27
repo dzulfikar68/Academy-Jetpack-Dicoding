@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.github.dzulfikar68.academy.R
-import io.github.dzulfikar68.academy.data.CourseEntity
+import io.github.dzulfikar68.academy.data.source.local.entity.CourseEntity
 import io.github.dzulfikar68.academy.databinding.ItemsBookmarkBinding
 import io.github.dzulfikar68.academy.ui.detail.DetailCourseActivity
 

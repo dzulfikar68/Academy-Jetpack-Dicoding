@@ -9,13 +9,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import io.github.dzulfikar68.academy.R
-import io.github.dzulfikar68.academy.data.ModuleEntity
+import io.github.dzulfikar68.academy.data.source.local.entity.ModuleEntity
 import io.github.dzulfikar68.academy.databinding.FragmentModuleListBinding
 import io.github.dzulfikar68.academy.ui.reader.CourseReaderActivity
 import io.github.dzulfikar68.academy.ui.reader.CourseReaderCallback
 import io.github.dzulfikar68.academy.ui.reader.CourseReaderViewModel
-import io.github.dzulfikar68.academy.utils.DataDummy
+import io.github.dzulfikar68.academy.viewmodel.ViewModelFactory
 
 class ModuleListFragment : Fragment(), MyAdapterClickListener {
 
@@ -39,11 +38,15 @@ class ModuleListFragment : Fragment(), MyAdapterClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel = ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory())[CourseReaderViewModel::class.java]
+        val factory = ViewModelFactory.getInstance(requireActivity())
+        viewModel = ViewModelProvider(requireActivity(), factory)[CourseReaderViewModel::class.java]
         adapter = ModuleListAdapter(this)
-        populateRecyclerView(viewModel.getModules())
-//        populateRecyclerView(DataDummy.generateDummyModules("a14"))
+
+        fragmentModuleListBinding.progressBar.visibility = View.VISIBLE
+        viewModel.getModules().observe(requireActivity(), { modules ->
+            fragmentModuleListBinding.progressBar.visibility = View.GONE
+            populateRecyclerView(modules)
+        })
     }
 
     override fun onAttach(context: Context) {

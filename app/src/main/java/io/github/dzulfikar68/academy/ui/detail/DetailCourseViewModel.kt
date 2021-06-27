@@ -1,27 +1,19 @@
 package io.github.dzulfikar68.academy.ui.detail
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import io.github.dzulfikar68.academy.data.CourseEntity
-import io.github.dzulfikar68.academy.data.ModuleEntity
-import io.github.dzulfikar68.academy.utils.DataDummy
+import io.github.dzulfikar68.academy.data.source.local.entity.CourseEntity
+import io.github.dzulfikar68.academy.data.source.local.entity.ModuleEntity
+import io.github.dzulfikar68.academy.data.AcademyRepository
 
-class DetailCourseViewModel : ViewModel() {
+class DetailCourseViewModel(private val academyRepository: AcademyRepository) : ViewModel() {
     private lateinit var courseId: String
 
     fun setSelectedCourse(courseId: String) {
         this.courseId = courseId
     }
 
-    fun getCourse(): CourseEntity {
-        lateinit var course: CourseEntity
-        val coursesEntities = DataDummy.generateDummyCourses()
-        for (courseEntity in coursesEntities) {
-            if (courseEntity.courseId == courseId) {
-                course = courseEntity
-            }
-        }
-        return course
-    }
+    fun getCourse(): LiveData<CourseEntity> = academyRepository.getCourseWithModules(courseId)
 
-    fun getModules(): List<ModuleEntity> = DataDummy.generateDummyModules(courseId)
+    fun getModules(): LiveData<List<ModuleEntity>> = academyRepository.getAllModulesByCourse(courseId)
 }

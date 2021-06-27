@@ -2,6 +2,7 @@ package io.github.dzulfikar68.academy.ui.detail
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -10,11 +11,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import io.github.dzulfikar68.academy.R
-import io.github.dzulfikar68.academy.data.CourseEntity
+import io.github.dzulfikar68.academy.data.source.local.entity.CourseEntity
 import io.github.dzulfikar68.academy.databinding.ActivityDetailCourseBinding
 import io.github.dzulfikar68.academy.databinding.ContentDetailCourseBinding
 import io.github.dzulfikar68.academy.ui.reader.CourseReaderActivity
-import io.github.dzulfikar68.academy.utils.DataDummy
+import io.github.dzulfikar68.academy.viewmodel.ViewModelFactory
 
 class DetailCourseActivity : AppCompatActivity() {
 
@@ -37,25 +38,24 @@ class DetailCourseActivity : AppCompatActivity() {
 
         val adapter = DetailCourseAdapter()
 
-        val viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[DetailCourseViewModel::class.java]
+        val factory = ViewModelFactory.getInstance(this)
+        val viewModel = ViewModelProvider(this, factory)[DetailCourseViewModel::class.java]
 
         val extras = intent.extras
         if (extras != null) {
             val courseId = extras.getString(EXTRA_COURSE)
             if (courseId != null) {
-//                val modules = DataDummy.generateDummyModules(courseId)
+                activityDetailCourseBinding.progressBar.visibility = View.VISIBLE
+                activityDetailCourseBinding.content.visibility = View.INVISIBLE
 
                 viewModel.setSelectedCourse(courseId)
-                val modules = viewModel.getModules()
-
-                adapter.setModules(modules)
-                populateCourse(viewModel.getCourse())
-
-//                for (course in DataDummy.generateDummyCourses()) {
-//                    if (course.courseId == courseId) {
-//                        populateCourse(course)
-//                    }
-//                }
+                viewModel.getModules().observe(this, { modules ->
+                    activityDetailCourseBinding.progressBar.visibility = View.GONE
+                    activityDetailCourseBinding.content.visibility = View.VISIBLE
+                    adapter.setModules(modules)
+                    adapter.notifyDataSetChanged()
+                })
+                viewModel.getCourse().observe(this, { course -> populateCourse(course) })
             }
         }
 
